@@ -5,7 +5,11 @@
 #include <deque>
 #include <condition_variable>
 #include "TrafficObject.h"
+#include <thread>
+#include <chrono>
+#include <future>
 
+enum class TrafficLightPhase {red, green};
 // forward declarations to avoid include cycle
 class Vehicle;
 
@@ -19,9 +23,15 @@ template <class T>
 class MessageQueue
 {
 public:
+    //MessageQueue();
+    //~MessageQueue();
+    void send(T &&phase);
+    T receive();
 
 private:
-    
+    std::deque<T> _queue;
+    std::condition_variable _condition;
+    std::mutex _mutex;
 };
 
 // FP.1 : Define a class „TrafficLight“ which is a child class of TrafficObject. 
@@ -30,24 +40,46 @@ private:
 // can be either „red“ or „green“. Also, add the private method „void cycleThroughPhases()“. 
 // Furthermore, there shall be the private member _currentPhase which can take „red“ or „green“ as its value. 
 
-class TrafficLight
+class TrafficLight : public TrafficObject
 {
 public:
     // constructor / desctructor
-
+    TrafficLight() {
+        srand(time(NULL));
+        /*int randNum = rand() % 1; // get random number from 0-1 to initiate traffic light phase
+        if (randNum == 1)
+        {
+            _currentPhase = TrafficLightPhase::green;
+        }
+        else
+        {
+            _currentPhase = TrafficLightPhase::red;
+        }*/
+        _currentPhase = TrafficLightPhase::red;
+    }
+    
     // getters / setters
+    TrafficLightPhase getCurrentPhase();
 
     // typical behaviour methods
+    void waitForGreen();
+    void simulate();
+
 
 private:
     // typical behaviour methods
+    void cycleThroughPhases();
+    void changePhase();
 
     // FP.4b : create a private member of type MessageQueue for messages of type TrafficLightPhase 
     // and use it within the infinite loop to push each new TrafficLightPhase into it by calling 
     // send in conjunction with move semantics.
+    MessageQueue<TrafficLightPhase> _queue;
 
     std::condition_variable _condition;
     std::mutex _mutex;
+    TrafficLightPhase _currentPhase; // init light as red, maybe want to do a random red/green?
+    
 };
 
 #endif
