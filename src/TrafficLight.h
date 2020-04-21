@@ -45,16 +45,6 @@ class TrafficLight : public TrafficObject
 public:
     // constructor / desctructor
     TrafficLight() {
-        srand(time(NULL));
-        /*int randNum = rand() % 1; // get random number from 0-1 to initiate traffic light phase
-        if (randNum == 1)
-        {
-            _currentPhase = TrafficLightPhase::green;
-        }
-        else
-        {
-            _currentPhase = TrafficLightPhase::red;
-        }*/
         _currentPhase = TrafficLightPhase::red;
     }
     
